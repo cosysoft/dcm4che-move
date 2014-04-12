@@ -68,12 +68,16 @@ import org.dcm4che.net.pdu.ExtendedNegotiation;
 import org.dcm4che.net.pdu.PresentationContext;
 import org.dcm4che.tool.common.CLIUtils;
 import org.dcm4che.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
  * 
  */
-public class MoveSCU extends Device {
+public class MoveSCUTool extends Device {
+	
+	private Logger logger = LoggerFactory.getLogger(MoveSCUTool.class);
 
 	ExecutorService executorService = Executors.newSingleThreadExecutor();
 	ScheduledExecutorService scheduledExecutorService = Executors
@@ -114,7 +118,7 @@ public class MoveSCU extends Device {
 	private int[] inFilter = DEF_IN_FILTER;
 	private Association as;
 
-	public MoveSCU() throws IOException {
+	public MoveSCUTool() throws IOException {
 		super("movescu");
 		addConnection(conn);
 		addApplicationEntity(ae);
@@ -166,7 +170,7 @@ public class MoveSCU extends Device {
 		CLIUtils.addRetrieveTimeoutOption(opts);
 		CLIUtils.addPriorityOption(opts);
 		CLIUtils.addCommonOptions(opts);
-		return CLIUtils.parseComandLine(args, opts, rb, MoveSCU.class);
+		return CLIUtils.parseComandLine(args, opts, rb, MoveSCUTool.class);
 	}
 
 	@SuppressWarnings("static-access")
@@ -204,7 +208,7 @@ public class MoveSCU extends Device {
 	public void execute(String[] args) {
 		try {
 			CommandLine cl = parseComandLine(args);
-			MoveSCU main = new MoveSCU();
+			MoveSCUTool main = new MoveSCUTool();
 			CLIUtils.configureConnect(main.remote, main.rq, cl);
 			CLIUtils.configureBind(main.conn, main.ae, cl);
 			CLIUtils.configure(main.conn, cl);
@@ -225,17 +229,14 @@ public class MoveSCU extends Device {
 
 			}
 		} catch (ParseException e) {
-			System.err.println("movescu: " + e.getMessage());
-			System.err.println(rb.getString("try"));
-			System.exit(2);
+			logger.debug(rb.getString("try"));
+			logger.error("{}",e);
 		} catch (Exception e) {
-			System.err.println("movescu: " + e.getMessage());
-			e.printStackTrace();
-			System.exit(2);
+			logger.error("{}",e);
 		}
 	}
 
-	private static void configureServiceClass(MoveSCU main, CommandLine cl)
+	private static void configureServiceClass(MoveSCUTool main, CommandLine cl)
 			throws ParseException {
 		main.setInformationModel(informationModelOf(cl),
 				CLIUtils.transferSyntaxesOf(cl), cl.hasOption("relational"));
@@ -247,7 +248,7 @@ public class MoveSCU extends Device {
 		throw new ParseException(rb.getString("missing-dest"));
 	}
 
-	private static void configureKeys(MoveSCU main, CommandLine cl) {
+	private static void configureKeys(MoveSCUTool main, CommandLine cl) {
 		if (cl.hasOption("m")) {
 			String[] keys = cl.getOptionValues("m");
 			for (int i = 1; i < keys.length; i++, i++)

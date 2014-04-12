@@ -11,7 +11,7 @@ import org.cosysoft.dcm.domain.DcmQuery;
 import org.cosysoft.dcm.domain.Image;
 import org.cosysoft.dcm.domain.RawStudy;
 import org.cosysoft.dcm.domain.Study;
-import org.cosysoft.dcm.tool.FindSCU;
+import org.cosysoft.dcm.tool.FindSCUTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +24,7 @@ public class QueryScuFacade {
 			"SOPInstanceUID", "-r", "PatientID", "-r", "ModalitiesInStudy");
 
 	private Logger logger = LoggerFactory.getLogger(QueryScuFacade.class);
-	private FindSCU findSCUFacade;
+	private FindSCUTool findSCUFacade;
 	private DicomConfig config;
 
 	public List<Study> getStudyByPatId(String patientID) {

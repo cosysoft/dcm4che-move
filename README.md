@@ -1,4 +1,4 @@
 dcm4che-move
 ============
 
-A facade for dcm4che movescu
+A facade for dcm4che movescu and findscu

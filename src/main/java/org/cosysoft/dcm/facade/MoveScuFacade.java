@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.cosysoft.dcm.domain.DcmMoveQuery;
-import org.cosysoft.dcm.tool.MoveSCU;
+import org.cosysoft.dcm.tool.MoveSCUTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +17,7 @@ public class MoveScuFacade {
 			.getLogger(MoveScuFacade.class);
 
 	DicomConfig config;
-	MoveSCU moveSCUFacade;
+	MoveSCUTool moveSCUFacade;
 
 	public void moveByStudyUID(String suid) {
 		DcmMoveQuery q = new DcmMoveQuery();

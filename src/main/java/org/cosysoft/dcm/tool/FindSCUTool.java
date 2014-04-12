@@ -78,13 +78,16 @@ import org.dcm4che.net.pdu.ExtendedNegotiation;
 import org.dcm4che.net.pdu.PresentationContext;
 import org.dcm4che.tool.common.CLIUtils;
 import org.dcm4che.util.SafeClose;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Gunter Zeilinger <gunterze@gmail.com>
  * 
  */
 
-public class FindSCU {
+public class FindSCUTool {
+	private static Logger logger =  LoggerFactory.getLogger(FindSCUTool.class);
 	ExecutorService executorService = Executors.newSingleThreadExecutor();
 	ScheduledExecutorService scheduledExecutorService = Executors
 			.newSingleThreadScheduledExecutor();
@@ -145,7 +148,7 @@ public class FindSCU {
 	private Association as;
 	private AtomicInteger totNumMatches = new AtomicInteger();
 
-	public FindSCU() throws IOException {
+	public FindSCUTool() throws IOException {
 		device.addConnection(conn);
 		device.addApplicationEntity(ae);
 		ae.addConnection(conn);
@@ -228,7 +231,7 @@ public class FindSCU {
 		CLIUtils.addResponseTimeoutOption(opts);
 		CLIUtils.addPriorityOption(opts);
 		CLIUtils.addCommonOptions(opts);
-		return CLIUtils.parseComandLine(args, opts, rb, FindSCU.class);
+		return CLIUtils.parseComandLine(args, opts, rb, FindSCUTool.class);
 	}
 
 	@SuppressWarnings("static-access")
@@ -289,7 +292,7 @@ public class FindSCU {
 		List<RawStudy> studies = new ArrayList<>();
 		try {
 			CommandLine cl = parseComandLine(args);
-			FindSCU main = new FindSCU();
+			FindSCUTool main = new FindSCUTool();
 			CLIUtils.configureConnect(main.remote, main.rq, cl);
 			CLIUtils.configureBind(main.conn, main.ae, cl);
 			CLIUtils.configure(main.conn, cl);
@@ -310,23 +313,21 @@ public class FindSCU {
 				while (!rsp.isFinished()) {
 				}
 				List<RawStudy> s = rsp.getRawStudy();
-				System.out.println(s);
 				return s;
 			} finally {
 				main.close();
 			}
 		} catch (ParseException e) {
-			System.err.println("findscu: " + e.getMessage());
-			System.err.println(rb.getString("try"));
+			logger.error("{}",e);
+			logger.debug(rb.getString("try"));
 		} catch (Exception e) {
-			System.err.println("findscu: " + e.getMessage());
-			e.printStackTrace();
+			logger.error("{}",e);
 		}
 
 		return studies;
 	}
 
-	private static EnumSet<QueryOption> queryOptionsOf(FindSCU main,
+	private static EnumSet<QueryOption> queryOptionsOf(FindSCUTool main,
 			CommandLine cl) {
 		EnumSet<QueryOption> queryOptions = EnumSet.noneOf(QueryOption.class);
 		if (cl.hasOption("relational"))
@@ -340,7 +341,7 @@ public class FindSCU {
 		return queryOptions;
 	}
 
-	private static void configureOutput(FindSCU main, CommandLine cl) {
+	private static void configureOutput(FindSCUTool main, CommandLine cl) {
 		if (cl.hasOption("out-dir"))
 			main.setOutputDirectory(new File(cl.getOptionValue("out-dir")));
 		main.setOutputFileFormat(cl.getOptionValue("out-file", "000.dcm"));
@@ -355,12 +356,12 @@ public class FindSCU {
 		main.setXMLIncludeNamespaceDeclaration(cl.hasOption("xmlns"));
 	}
 
-	private static void configureCancel(FindSCU main, CommandLine cl) {
+	private static void configureCancel(FindSCUTool main, CommandLine cl) {
 		if (cl.hasOption("cancel"))
 			main.setCancelAfter(Integer.parseInt(cl.getOptionValue("cancel")));
 	}
 
-	private static void configureKeys(FindSCU main, CommandLine cl) {
+	private static void configureKeys(FindSCUTool main, CommandLine cl) {
 		CLIUtils.addEmptyAttributes(main.keys, cl.getOptionValues("r"));
 		CLIUtils.addAttributes(main.keys, cl.getOptionValues("m"));
 		if (cl.hasOption("L"))
@@ -369,7 +370,7 @@ public class FindSCU {
 			main.setInputFilter(CLIUtils.toTags(cl.getOptionValues("i")));
 	}
 
-	private static void configureServiceClass(FindSCU main, CommandLine cl)
+	private static void configureServiceClass(FindSCUTool main, CommandLine cl)
 			throws ParseException {
 		main.setInformationModel(informationModelOf(cl),
 				CLIUtils.transferSyntaxesOf(cl), queryOptionsOf(main, cl));
